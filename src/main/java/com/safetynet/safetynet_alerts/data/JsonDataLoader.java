@@ -10,20 +10,20 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-@Configuration
+@Component
 @Getter
 public class JsonDataLoader {
 
-    public List<Person> persons;
-    public List<Firestation> firestations;
-    public List<MedicalRecord> medicalRecords;
+    private List<Person> persons;
+    private List<Firestation> firestations;
+    private List<MedicalRecord> medicalRecords;
 
     private static final Logger log = LoggerFactory.getLogger(JsonDataLoader.class);
 
