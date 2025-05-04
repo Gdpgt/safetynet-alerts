@@ -3,11 +3,12 @@ package com.safetynet.safetynet_alerts.data;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.safetynet.safetynet_alerts.models.Firestation;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
 import com.safetynet.safetynet_alerts.models.Person;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@Getter
+@Data
 public class JsonDataLoader {
 
     private List<Person> persons;
@@ -31,9 +32,10 @@ public class JsonDataLoader {
     public void loadJson() {
 
         try {
-            File input = new File("src/main/data.json");
+            File input = new File("src/main/resources/data.json");
 
             ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
             DataSet dt = mapper.readValue(input, DataSet.class);
 
             this.persons = dt.getPersons();
