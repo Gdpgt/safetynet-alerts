@@ -18,4 +18,29 @@ public class PersonRepository {
     public List<Person> findAll() {
         return jsonDataLoader.getPersons();
     }
+
+    public Person findByFirstAndLastName(String firstName, String lastName) {
+        return jsonDataLoader.getPersons().stream()
+                .filter(p -> p.getFirstName().equalsIgnoreCase(firstName)
+                        && p.getLastName().equalsIgnoreCase(lastName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addPerson(Person person) {
+        jsonDataLoader.getPersons().add(person);
+    }
+
+    public void updatePersonFields(Person existingPerson, Person updatedData) {
+        existingPerson.setAddress(updatedData.getAddress());
+        existingPerson.setCity(updatedData.getCity());
+        existingPerson.setZip(updatedData.getZip());
+        existingPerson.setPhone(updatedData.getPhone());
+        existingPerson.setEmail(updatedData.getEmail());
+    }
+
+    public void deletePerson(Person person) {
+        jsonDataLoader.getPersons().remove(person);
+    }
+
 }
