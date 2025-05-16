@@ -1,11 +1,13 @@
 package com.safetynet.safetynet_alerts.repositories;
 
+import ch.qos.logback.core.joran.sanity.Pair;
 import com.safetynet.safetynet_alerts.data.JsonDataLoader;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class MedicalRecordRepository {

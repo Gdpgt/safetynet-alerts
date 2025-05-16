@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class FirestationRepository {
@@ -42,6 +43,13 @@ public class FirestationRepository {
 
     public void delete(Firestation existingFirestation) {
         jsonDataLoader.getFirestations().remove(existingFirestation);
+    }
+
+
+    public List<Firestation> findByStationNumber(int stationNumber) {
+        return jsonDataLoader.getFirestations().stream()
+                .filter(f -> f.getStation() == stationNumber)
+                .toList();
     }
 
 }

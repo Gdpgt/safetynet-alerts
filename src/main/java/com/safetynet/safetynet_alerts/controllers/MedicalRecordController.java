@@ -19,7 +19,7 @@ public class MedicalRecordController {
     }
 
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<MedicalRecord>> getAll() {
         return medicalRecordService.retrieveAll();
     }

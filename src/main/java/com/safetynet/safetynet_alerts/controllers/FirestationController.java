@@ -19,7 +19,7 @@ public class FirestationController {
         this.firestationService = firestationService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Firestation>> getAll() {
         return firestationService.retrieveAll();
     }

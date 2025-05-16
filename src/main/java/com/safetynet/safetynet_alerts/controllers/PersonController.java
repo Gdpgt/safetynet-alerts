@@ -19,7 +19,7 @@ public class PersonController {
     }
 
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Person>> getAll() {
         return personService.retrieveAll();
     }

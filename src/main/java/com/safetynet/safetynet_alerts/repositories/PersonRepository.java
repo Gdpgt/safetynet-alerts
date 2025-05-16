@@ -48,4 +48,11 @@ public class PersonRepository {
         jsonDataLoader.getPersons().remove(existingPerson);
     }
 
+
+    public List<Person> findByAddresses(List<String> addresses) {
+        return jsonDataLoader.getPersons().stream()
+                .filter(p -> addresses.contains(p.getAddress()))
+                .toList();
+    }
+
 }
