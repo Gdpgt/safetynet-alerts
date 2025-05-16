@@ -5,6 +5,7 @@ import com.safetynet.safetynet_alerts.models.Firestation;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class FirestationRepository {
@@ -15,8 +16,32 @@ public class FirestationRepository {
         this.jsonDataLoader = jsonDataLoader;
     }
 
+
     public List<Firestation> findAll() {
         return jsonDataLoader.getFirestations();
+    }
+
+
+    public Optional<Firestation> findByStationNumberAndAddress(int stationNumber, String address) {
+        return jsonDataLoader.getFirestations().stream()
+                .filter(f -> f.getStation() == stationNumber
+                        && f.getAddress().equalsIgnoreCase(address))
+                .findFirst();
+    }
+
+
+    public void add(Firestation firestation) {
+        jsonDataLoader.getFirestations().add(firestation);
+    }
+
+
+    public void updateStationNumber(Firestation existingFirestation, int stationNumber) {
+        existingFirestation.setStation(stationNumber);
+    }
+
+
+    public void delete(Firestation firestation) {
+        jsonDataLoader.getFirestations().remove(firestation);
     }
 
 }
