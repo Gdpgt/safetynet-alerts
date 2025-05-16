@@ -44,8 +44,8 @@ public class PersonRepository {
     }
 
 
-    public void delete(Person person) {
-        jsonDataLoader.getPersons().remove(person);
+    public void delete(Person existingPerson) {
+        jsonDataLoader.getPersons().remove(existingPerson);
     }
 
 }

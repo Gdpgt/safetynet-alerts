@@ -14,7 +14,7 @@ public class PersonController {
 
     private final PersonService personService;
 
-    PersonController(PersonService personService) {
+    public PersonController(PersonService personService) {
         this.personService = personService;
     }
 
@@ -26,14 +26,14 @@ public class PersonController {
 
 
     @PostMapping
-    public ResponseEntity<String> add(@RequestBody PersonDTO personDTO) {
-        return personService.registerIfAbsent(personDTO);
+    public ResponseEntity<String> add(@RequestBody PersonDTO dto) {
+        return personService.registerIfAbsent(dto);
     }
 
 
     @PutMapping
-    public ResponseEntity<String> update(@RequestBody PersonDTO personDTO) {
-        return personService.updatePersonalInformation(personDTO);
+    public ResponseEntity<String> update(@RequestBody PersonDTO dto) {
+        return personService.updatePersonalInformation(dto);
     }
 
 

@@ -19,7 +19,7 @@ public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
-    PersonService(PersonRepository personRepository) {
+    public PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
     }
 

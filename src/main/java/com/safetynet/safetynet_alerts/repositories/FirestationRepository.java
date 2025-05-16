@@ -35,13 +35,13 @@ public class FirestationRepository {
     }
 
 
-    public void updateStationNumber(Firestation existingFirestation, int stationNumber) {
-        existingFirestation.setStation(stationNumber);
+    public void updateStationNumber(Firestation existingFirestation, int newStationNumber) {
+        existingFirestation.setStation(newStationNumber);
     }
 
 
-    public void delete(Firestation firestation) {
-        jsonDataLoader.getFirestations().remove(firestation);
+    public void delete(Firestation existingFirestation) {
+        jsonDataLoader.getFirestations().remove(existingFirestation);
     }
 
 }

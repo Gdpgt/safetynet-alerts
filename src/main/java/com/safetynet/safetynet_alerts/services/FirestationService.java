@@ -20,7 +20,7 @@ public class FirestationService {
 
     private static final Logger log = LoggerFactory.getLogger(FirestationService.class);
 
-    FirestationService(FirestationRepository firestationRepository) {
+    public FirestationService(FirestationRepository firestationRepository) {
         this.firestationRepository = firestationRepository;
     }
 

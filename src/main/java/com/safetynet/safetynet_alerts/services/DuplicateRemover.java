@@ -16,7 +16,7 @@ public class DuplicateRemover {
 
     private static final Logger log = LoggerFactory.getLogger(DuplicateRemover.class);
 
-    DuplicateRemover(JsonDataLoader jsonDataLoader) {
+    public DuplicateRemover(JsonDataLoader jsonDataLoader) {
         this.jsonDataLoader = jsonDataLoader;
     }
 

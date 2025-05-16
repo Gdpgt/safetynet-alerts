@@ -15,7 +15,7 @@ public class FirestationController {
 
     private final FirestationService firestationService;
 
-    FirestationController(FirestationService firestationService) {
+    public FirestationController(FirestationService firestationService) {
         this.firestationService = firestationService;
     }
 
