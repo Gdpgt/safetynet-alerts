@@ -1,7 +1,6 @@
 package com.safetynet.safetynet_alerts.services;
 
-import com.safetynet.safetynet_alerts.dto.FirestationCoverageDTO;
-import com.safetynet.safetynet_alerts.dto.PersonCoveredByFirestationDTO;
+import com.safetynet.safetynet_alerts.dto.*;
 import com.safetynet.safetynet_alerts.models.Firestation;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
 import com.safetynet.safetynet_alerts.models.Person;
@@ -41,7 +40,7 @@ public class AlertService {
 
 
     public ResponseEntity<FirestationCoverageDTO> retrievePersonsCoveredByFirestationNumber(int stationNumber) {
-        List<String> addresses = getAddressesByStationNumber(stationNumber);
+        Set<String> addresses = getAddressesByStationNumber(stationNumber);
 
         if (addresses.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La caserne de pompier n°" + stationNumber + " n'existe pas.");
@@ -52,13 +51,14 @@ public class AlertService {
         long numberOfChildren = countNumberOfChildren(birthdates);
         List<PersonCoveredByFirestationDTO> coveredPersonsDTO = coveredPersons.stream()
                 .map(p -> new PersonCoveredByFirestationDTO(p.getFirstName(), p.getLastName(), p.getAddress(), p.getPhone())).toList();
+        log.info("Les personnes liées à la caserne de pompier n°{} ont été récupérées", stationNumber);
         return ResponseEntity.ok(new FirestationCoverageDTO(coveredPersonsDTO, numberOfAdults, numberOfChildren));
     }
 
 
-    private List<String> getAddressesByStationNumber(int stationNumber) {
+    private Set<String> getAddressesByStationNumber(int stationNumber) {
         List<Firestation> firestations = firestationRepository.findByStationNumber(stationNumber);
-        return firestations.stream().map(Firestation::getAddress).toList();
+        return firestations.stream().map(Firestation::getAddress).collect(Collectors.toSet());
     }
 
 
@@ -77,5 +77,34 @@ public class AlertService {
     private long countNumberOfChildren(List<LocalDate> birthdates) {
         return birthdates.stream().filter(b -> Period.between(b, LocalDate.now()).getYears() <= 18).count();
     }
+
+
+    public ResponseEntity<ChildrenAndFamilyMembersByAddressDTO> retrieveChildrenAndFamilyMembersByAddress(String address) {
+        List<Person> personsFromAddress = personRepository.findByAddress(address);
+
+        if (address.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "L'adresse \"" + address + "\" n'existe pas.");
+        }
+
+        Set<String> fullnames = personsFromAddress.stream().map(p -> p.getFirstName() + " " + p.getLastName()).collect(Collectors.toSet());
+        List<MedicalRecord> medicalRecordsOfChildren = medicalRecordRepository.findAll().stream().filter(m -> fullnames.contains(m.getFirstName() + " " + m.getLastName()) && calculateAge(m.getBirthdate()) <= 18).toList();
+
+        if (medicalRecordsOfChildren.isEmpty()) {
+            log.info("Il n'y a pas d'enfant à l'adresse \"{}\".", address);
+            return ResponseEntity.ok().body(null);
+        }
+
+        List<MedicalRecord> medicalRecordsOfAdults = medicalRecordRepository.findAll().stream().filter(m -> fullnames.contains(m.getFirstName() + " " + m.getLastName()) && calculateAge(m.getBirthdate()) > 18).toList();
+        List<ChildDTO> childrenFromAddress = medicalRecordsOfChildren.stream().map(m -> new ChildDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
+        List<FamilyMemberDTO> adultsFromAddress = medicalRecordsOfAdults.stream().map(m -> new FamilyMemberDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
+        log.info("Les enfants et membre du foyer de l'adresse \"{}\" ont été récupérés.", address);
+        return ResponseEntity.ok(new ChildrenAndFamilyMembersByAddressDTO(childrenFromAddress, adultsFromAddress));
+    }
+
+
+    private int calculateAge(LocalDate birthdate) {
+        return Period.between(birthdate, LocalDate.now()).getYears();
+    }
+
 
 }

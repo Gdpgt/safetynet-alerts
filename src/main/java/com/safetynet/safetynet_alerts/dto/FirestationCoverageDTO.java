@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FirestationCoverageDTO {
 
-    List<PersonCoveredByFirestationDTO> coveredPersons;
-    long numberOfAdults;
-    long numberofChildren;
+    private List<PersonCoveredByFirestationDTO> coveredPersons;
+    private long numberOfAdults;
+    private long numberofChildren;
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class PersonRepository {
@@ -49,9 +50,16 @@ public class PersonRepository {
     }
 
 
-    public List<Person> findByAddresses(List<String> addresses) {
+    public List<Person> findByAddresses(Set<String> addresses) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> addresses.contains(p.getAddress()))
+                .toList();
+    }
+
+
+    public List<Person> findByAddress(String address) {
+        return jsonDataLoader.getPersons().stream()
+                .filter(p -> p.getAddress().equalsIgnoreCase(address))
                 .toList();
     }
 
