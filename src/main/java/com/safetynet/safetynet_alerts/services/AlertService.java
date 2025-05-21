@@ -82,7 +82,7 @@ public class AlertService {
     public ResponseEntity<ChildrenAndFamilyMembersByAddressDTO> retrieveChildrenAndFamilyMembersByAddress(String address) {
         List<Person> personsFromAddress = personRepository.findByAddress(address);
 
-        if (address.isEmpty()) {
+        if (personsFromAddress.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "L'adresse \"" + address + "\" n'existe pas.");
         }
 
@@ -96,14 +96,36 @@ public class AlertService {
 
         List<MedicalRecord> medicalRecordsOfAdults = medicalRecordRepository.findAll().stream().filter(m -> fullnames.contains(m.getFirstName() + " " + m.getLastName()) && calculateAge(m.getBirthdate()) > 18).toList();
         List<ChildDTO> childrenFromAddress = medicalRecordsOfChildren.stream().map(m -> new ChildDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
-        List<FamilyMemberDTO> adultsFromAddress = medicalRecordsOfAdults.stream().map(m -> new FamilyMemberDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
+        List<FamilyMemberDTO> familyMembers = medicalRecordsOfAdults.stream().map(m -> new FamilyMemberDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
         log.info("Les enfants et membre du foyer de l'adresse \"{}\" ont été récupérés.", address);
-        return ResponseEntity.ok(new ChildrenAndFamilyMembersByAddressDTO(childrenFromAddress, adultsFromAddress));
+        return ResponseEntity.ok(new ChildrenAndFamilyMembersByAddressDTO(childrenFromAddress, familyMembers));
     }
 
 
     private int calculateAge(LocalDate birthdate) {
         return Period.between(birthdate, LocalDate.now()).getYears();
+    }
+
+
+    public ResponseEntity<PhoneNumbersByFirestationNumberDTO> retrievePhoneNumbersByFirestationNumber(int firestationNumber) {
+        Set<String> addressesByFirestationNumber = firestationRepository.findByStationNumber(firestationNumber).stream()
+                .map(Firestation::getAddress).collect(Collectors.toSet());
+
+        if (addressesByFirestationNumber.isEmpty()) {
+            log.info("La caserne de pompier n°{} n'existe pas.", firestationNumber);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La caserne de pompier n'existe pas.");
+        }
+
+        Set<String> phoneNumbers = personRepository.findByAddresses(addressesByFirestationNumber).stream()
+                .map(Person::getPhone).collect(Collectors.toSet());
+
+        if (phoneNumbers.isEmpty()) {
+            log.info("Aucune personne n'est rattachée aux adresses \"{}\".", addressesByFirestationNumber);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune personne n'est rattachée à cette adresse.");
+        }
+
+        log.info("Les numéros de téléphone rattachés à la caserne de pompier n°{} ont été récupérés.", firestationNumber);
+        return ResponseEntity.ok(new PhoneNumbersByFirestationNumberDTO(phoneNumbers));
     }
 
 
