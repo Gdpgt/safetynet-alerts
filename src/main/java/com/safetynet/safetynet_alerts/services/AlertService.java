@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,7 @@ public class AlertService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "L'adresse \"" + address + "\" n'existe pas.");
         }
 
-        Set<String> fullnames = personsFromAddress.stream().map(p -> p.getFirstName() + " " + p.getLastName()).collect(Collectors.toSet());
+        Set<String> fullnames = getFullNamesOfPersons(personsFromAddress);
         List<MedicalRecord> medicalRecordsOfChildren = medicalRecordRepository.findAll().stream().filter(m -> fullnames.contains(m.getFirstName() + " " + m.getLastName()) && calculateAge(m.getBirthdate()) <= 18).toList();
 
         if (medicalRecordsOfChildren.isEmpty()) {
@@ -97,8 +98,13 @@ public class AlertService {
         List<MedicalRecord> medicalRecordsOfAdults = medicalRecordRepository.findAll().stream().filter(m -> fullnames.contains(m.getFirstName() + " " + m.getLastName()) && calculateAge(m.getBirthdate()) > 18).toList();
         List<ChildDTO> childrenFromAddress = medicalRecordsOfChildren.stream().map(m -> new ChildDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
         List<FamilyMemberDTO> familyMembers = medicalRecordsOfAdults.stream().map(m -> new FamilyMemberDTO(m.getFirstName(), m.getLastName(), calculateAge(m.getBirthdate()))).toList();
-        log.info("Les enfants et membre du foyer de l'adresse \"{}\" ont été récupérés.", address);
+        log.info("Les enfants et membres du foyer de l'adresse \"{}\" ont été récupérés.", address);
         return ResponseEntity.ok(new ChildrenAndFamilyMembersByAddressDTO(childrenFromAddress, familyMembers));
+    }
+
+
+    private Set<String> getFullNamesOfPersons(List<Person> persons) {
+        return persons.stream().map(p -> p.getFirstName() + " " + p.getLastName()).collect(Collectors.toSet());
     }
 
 
@@ -108,8 +114,7 @@ public class AlertService {
 
 
     public ResponseEntity<PhoneNumbersByFirestationNumberDTO> retrievePhoneNumbersByFirestationNumber(int firestationNumber) {
-        Set<String> addressesByFirestationNumber = firestationRepository.findByStationNumber(firestationNumber).stream()
-                .map(Firestation::getAddress).collect(Collectors.toSet());
+        Set<String> addressesByFirestationNumber = getAddressesByStationNumber(firestationNumber);
 
         if (addressesByFirestationNumber.isEmpty()) {
             log.info("La caserne de pompier n°{} n'existe pas.", firestationNumber);
@@ -126,6 +131,57 @@ public class AlertService {
 
         log.info("Les numéros de téléphone rattachés à la caserne de pompier n°{} ont été récupérés.", firestationNumber);
         return ResponseEntity.ok(new PhoneNumbersByFirestationNumberDTO(phoneNumbers));
+    }
+
+
+    public ResponseEntity<ResidentsAndStationByAddressDTO> retrieveResidentsAndStationByAddress(String address) {
+        Optional<Integer> stationNumber = firestationRepository.findByAddress(address);
+
+        if (stationNumber.isEmpty()) {
+            log.info("Aucune caserne de pompier n'existe à l'adresse \"{}\".", address);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune caserne de pompier n'existe à cette adresse.");
+        }
+
+        List<Person> personsByAddress = personRepository.findByAddress(address);
+
+        if (personsByAddress.isEmpty()) {
+            log.info("Aucune personne n'habite à l'adresse \"{}\".", address);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune personne n'habite à cette adresse.");
+        }
+
+        log.info("Les habitants de l'adresse \"{}\" et le numéro de la caserne de pompier y étant rattachée ont été récupérés.", address);
+        return ResponseEntity.ok(new ResidentsAndStationByAddressDTO(createResidentsByAddress(personsByAddress), stationNumber.get()));
+    }
+
+
+    private List<ResidentByAddressDTO> createResidentsByAddress(List<Person> persons) {
+        return persons.stream()
+                .map(p -> {
+                    MedicalRecord medicalRecord = getMedicalRecordByFirstAndLastName(p.getFirstName(), p.getLastName());
+                    return new ResidentByAddressDTO(p.getLastName(), p.getPhone()
+                            , calculateAge(medicalRecord.getBirthdate())
+                            , getMedicationsAndAllergiesByMedicalRecord(medicalRecord));
+                })
+                .toList();
+    }
+
+
+    private MedicalRecord getMedicalRecordByFirstAndLastName(String firstName, String lastName) {
+        Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findAll().stream()
+                .filter(m -> (m.getFirstName() + " " + m.getLastName()).equalsIgnoreCase(firstName + " " + lastName))
+                .findFirst();
+
+        if (medicalRecord.isEmpty()) {
+            log.info("La personne \"{}\" liée à l'adresse n'a pas de dossier médical.", firstName + " " + lastName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La personne liée à l'adresse n'a pas de dossier médical.");
+        }
+
+        return medicalRecord.get();
+    }
+
+
+    private MedicationsAndAllergiesDTO getMedicationsAndAllergiesByMedicalRecord(MedicalRecord medicalRecord) {
+        return new MedicationsAndAllergiesDTO(medicalRecord.getMedications(), medicalRecord.getAllergies());
     }
 
 

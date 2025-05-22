@@ -9,5 +9,5 @@ import java.util.Set;
 @AllArgsConstructor
 public class PhoneNumbersByFirestationNumberDTO {
 
-    Set<String> phoneNumbersByFirestationNumber;
+    private Set<String> phoneNumbersByFirestationNumber;
 }
