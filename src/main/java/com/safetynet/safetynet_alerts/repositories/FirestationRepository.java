@@ -52,4 +52,12 @@ public class FirestationRepository {
                 .toList();
     }
 
+
+    public Optional<Integer> findByAddress(String address) {
+        return jsonDataLoader.getFirestations().stream()
+                .filter(f -> f.getAddress().equalsIgnoreCase(address))
+                .map(Firestation::getStation)
+                .findFirst();
+    }
+
 }
