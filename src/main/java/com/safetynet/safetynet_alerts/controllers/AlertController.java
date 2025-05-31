@@ -1,14 +1,13 @@
 package com.safetynet.safetynet_alerts.controllers;
 
-import com.safetynet.safetynet_alerts.dto.ChildrenAndFamilyMembersByAddressDTO;
-import com.safetynet.safetynet_alerts.dto.FirestationCoverageDTO;
-import com.safetynet.safetynet_alerts.dto.PhoneNumbersByFirestationNumberDTO;
-import com.safetynet.safetynet_alerts.dto.ResidentsAndStationByAddressDTO;
+import com.safetynet.safetynet_alerts.dto.*;
 import com.safetynet.safetynet_alerts.services.AlertService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 @RestController
 public class AlertController {
@@ -41,6 +40,12 @@ public class AlertController {
     @GetMapping("/fire")
     public ResponseEntity<ResidentsAndStationByAddressDTO> getResidentsAndStationByAddress(@RequestParam String address) {
         return alertService.retrieveResidentsAndStationByAddress(address);
+    }
+
+
+    @GetMapping("/flood/stations")
+    public ResponseEntity<ResidentsByFirestationNumbersDTO> getResidentsByFirestationNumbers(@RequestParam Set<Integer> stations) {
+        return alertService.retrieveResidentsByFirestationNumbers(stations);
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,9 +45,10 @@ public class AlertService {
         Set<String> addresses = getAddressesByStationNumber(stationNumber);
 
         if (addresses.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La caserne de pompier n°" + stationNumber + " n'existe pas.");
+            log.info("La caserne de pompier n°{} n'existe pas.", stationNumber);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        List<Person> coveredPersons = personRepository.findByAddresses(addresses);
+        Set<Person> coveredPersons = personRepository.findByAddresses(addresses);
         List<LocalDate> birthdates = getBirthdatesOfPersons(coveredPersons);
         long numberOfAdults = countNumberOfAdults(birthdates);
         long numberOfChildren = countNumberOfChildren(birthdates);
@@ -63,7 +65,7 @@ public class AlertService {
     }
 
 
-    private List<LocalDate> getBirthdatesOfPersons(List<Person> coveredPersons) {
+    private List<LocalDate> getBirthdatesOfPersons(Set<Person> coveredPersons) {
         Set<String> fullNames = coveredPersons.stream().map(p -> p.getFirstName() + " " + p.getLastName()).collect(Collectors.toSet());
         return medicalRecordRepository.findAll().stream()
                 .filter(m -> fullNames.contains(m.getFirstName() + " " + m.getLastName())).map(MedicalRecord::getBirthdate).toList();
@@ -84,7 +86,8 @@ public class AlertService {
         List<Person> personsFromAddress = personRepository.findByAddress(address);
 
         if (personsFromAddress.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "L'adresse \"" + address + "\" n'existe pas.");
+            log.info("Personne n'habite à l'adresse \"{}\".", address);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         Set<String> fullnames = getFullNamesOfPersons(personsFromAddress);
@@ -118,7 +121,7 @@ public class AlertService {
 
         if (addressesByFirestationNumber.isEmpty()) {
             log.info("La caserne de pompier n°{} n'existe pas.", firestationNumber);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La caserne de pompier n'existe pas.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         Set<String> phoneNumbers = personRepository.findByAddresses(addressesByFirestationNumber).stream()
@@ -126,7 +129,7 @@ public class AlertService {
 
         if (phoneNumbers.isEmpty()) {
             log.info("Aucune personne n'est rattachée aux adresses \"{}\".", addressesByFirestationNumber);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune personne n'est rattachée à cette adresse.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         log.info("Les numéros de téléphone rattachés à la caserne de pompier n°{} ont été récupérés.", firestationNumber);
@@ -135,26 +138,34 @@ public class AlertService {
 
 
     public ResponseEntity<ResidentsAndStationByAddressDTO> retrieveResidentsAndStationByAddress(String address) {
-        Optional<Integer> stationNumber = firestationRepository.findByAddress(address);
+        Optional<Integer> stationNumber = getStationNumberByAddress(address);
 
         if (stationNumber.isEmpty()) {
             log.info("Aucune caserne de pompier n'existe à l'adresse \"{}\".", address);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune caserne de pompier n'existe à cette adresse.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         List<Person> personsByAddress = personRepository.findByAddress(address);
 
         if (personsByAddress.isEmpty()) {
             log.info("Aucune personne n'habite à l'adresse \"{}\".", address);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucune personne n'habite à cette adresse.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         log.info("Les habitants de l'adresse \"{}\" et le numéro de la caserne de pompier y étant rattachée ont été récupérés.", address);
-        return ResponseEntity.ok(new ResidentsAndStationByAddressDTO(createResidentsByAddress(personsByAddress), stationNumber.get()));
+        return ResponseEntity.ok(new ResidentsAndStationByAddressDTO(createResidentsByAddressDTO(personsByAddress), stationNumber.get()));
     }
 
 
-    private List<ResidentByAddressDTO> createResidentsByAddress(List<Person> persons) {
+    private Optional<Integer> getStationNumberByAddress(String address) {
+        return firestationRepository.findAll().stream()
+                .filter(f -> f.getAddress().equalsIgnoreCase(address))
+                .map(Firestation::getStation)
+                .findFirst();
+    }
+
+
+    private List<ResidentByAddressDTO> createResidentsByAddressDTO(List<Person> persons) {
         return persons.stream()
                 .map(p -> {
                     MedicalRecord medicalRecord = getMedicalRecordByFirstAndLastName(p.getFirstName(), p.getLastName());
@@ -172,8 +183,8 @@ public class AlertService {
                 .findFirst();
 
         if (medicalRecord.isEmpty()) {
-            log.info("La personne \"{}\" liée à l'adresse n'a pas de dossier médical.", firstName + " " + lastName);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La personne liée à l'adresse n'a pas de dossier médical.");
+            log.warn("La personne \"{}\" liée à l'adresse n'a pas de dossier médical.", firstName + " " + lastName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         return medicalRecord.get();
@@ -184,5 +195,40 @@ public class AlertService {
         return new MedicationsAndAllergiesDTO(medicalRecord.getMedications(), medicalRecord.getAllergies());
     }
 
+
+    public ResponseEntity<ResidentsByFirestationNumbersDTO> retrieveResidentsByFirestationNumbers(Set<Integer> stationNumbers) {
+        Set<String> addresses = getAddressesByStationNumbers(stationNumbers);
+
+        if (addresses.isEmpty()) {
+            log.warn("Le(s) numéro(s) {} de caserne de pompier n'existe(nt) pas.", stationNumbers);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        List<AddressAndItsResidentsDTO> addressesAndTheirResidentsDTO = addresses.stream()
+                .map(this::buildAddressResidentsDTO)
+                .toList();
+
+        log.info("Les adresses et résidents de la ou des casernes de pompier n°{} ont été récupérés.", stationNumbers);
+        return ResponseEntity.ok(new ResidentsByFirestationNumbersDTO(addressesAndTheirResidentsDTO));
+    }
+
+
+    private Set<String> getAddressesByStationNumbers(Set<Integer> stationNumbers) {
+        return firestationRepository.findAll().stream()
+                .filter(f -> stationNumbers.contains(f.getStation()))
+                .map(Firestation::getAddress).collect(Collectors.toSet());
+    }
+
+
+    private AddressAndItsResidentsDTO buildAddressResidentsDTO(String address) {
+        List<Person> residents = personRepository.findByAddress(address);
+
+        if (residents.isEmpty()) {
+            log.warn("Personne n'habite à l'adresse \"{}\".", address);
+            return new AddressAndItsResidentsDTO(address, Collections.emptyList());
+        }
+
+        return new AddressAndItsResidentsDTO(address, createResidentsByAddressDTO(residents));
+    }
 
 }

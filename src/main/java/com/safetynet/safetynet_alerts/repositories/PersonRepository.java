@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class PersonRepository {
@@ -50,10 +51,10 @@ public class PersonRepository {
     }
 
 
-    public List<Person> findByAddresses(Set<String> addresses) {
+    public Set<Person> findByAddresses(Set<String> addresses) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> addresses.contains(p.getAddress()))
-                .toList();
+                .collect(Collectors.toSet());
     }
 
 
