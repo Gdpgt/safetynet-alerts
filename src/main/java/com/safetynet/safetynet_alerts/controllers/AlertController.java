@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -46,6 +47,12 @@ public class AlertController {
     @GetMapping("/flood/stations")
     public ResponseEntity<ResidentsByFirestationNumbersDTO> getResidentsByFirestationNumbers(@RequestParam Set<Integer> stations) {
         return alertService.retrieveResidentsByFirestationNumbers(stations);
+    }
+
+
+    @GetMapping("/personInfo")
+    public ResponseEntity<List<ResidentByLastNameDTO>> getPersonsInfoByLastName(@RequestParam String lastName) {
+        return alertService.retrievePersonsInfoByLastName(lastName);
     }
 
 }

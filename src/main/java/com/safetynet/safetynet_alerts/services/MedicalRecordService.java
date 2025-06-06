@@ -2,15 +2,20 @@ package com.safetynet.safetynet_alerts.services;
 
 import com.safetynet.safetynet_alerts.dto.MedicalRecordDTO;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
+import com.safetynet.safetynet_alerts.models.Person;
 import com.safetynet.safetynet_alerts.repositories.MedicalRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicalRecordService {
@@ -66,6 +71,27 @@ public class MedicalRecordService {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Le dossier médical n'existe pas.");
         }
+    }
+
+
+    public List<LocalDate> getBirthdatesOfPersons(Set<Person> coveredPersons) {
+        Set<String> fullNames = coveredPersons.stream().map(p -> p.getFirstName() + " " + p.getLastName()).collect(Collectors.toSet());
+        return medicalRecordRepository.findAll().stream()
+                .filter(m -> fullNames.contains(m.getFirstName() + " " + m.getLastName())).map(MedicalRecord::getBirthdate).toList();
+    }
+
+
+    public MedicalRecord getMedicalRecordByFirstAndLastName(String firstName, String lastName) {
+        Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findAll().stream()
+                .filter(m -> (m.getFirstName() + " " + m.getLastName()).equalsIgnoreCase(firstName + " " + lastName))
+                .findFirst();
+
+        if (medicalRecord.isEmpty()) {
+            log.warn("La personne \"{}\" liée à l'adresse n'a pas de dossier médical.", firstName + " " + lastName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return medicalRecord.get();
     }
 
 }

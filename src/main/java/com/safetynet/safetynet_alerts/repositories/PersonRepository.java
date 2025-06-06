@@ -64,4 +64,11 @@ public class PersonRepository {
                 .toList();
     }
 
+
+    public List<Person> findByLastName(String lastName) {
+        return jsonDataLoader.getPersons().stream()
+                .filter(p -> p.getLastName().equalsIgnoreCase(lastName))
+                .toList();
+    }
+
 }

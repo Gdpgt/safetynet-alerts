@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FirestationService {
@@ -67,6 +69,27 @@ public class FirestationService {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La caserne de pompier n'existe pas.");
         }
+    }
+
+
+    public Set<String> getAddressesByStationNumber(int stationNumber) {
+        List<Firestation> firestations = firestationRepository.findByStationNumber(stationNumber);
+        return firestations.stream().map(Firestation::getAddress).collect(Collectors.toSet());
+    }
+
+
+    public Optional<Integer> getStationNumberByAddress(String address) {
+        return firestationRepository.findAll().stream()
+                .filter(f -> f.getAddress().equalsIgnoreCase(address))
+                .map(Firestation::getStation)
+                .findFirst();
+    }
+
+
+    public Set<String> getAddressesByStationNumbers(Set<Integer> stationNumbers) {
+        return firestationRepository.findAll().stream()
+                .filter(f -> stationNumbers.contains(f.getStation()))
+                .map(Firestation::getAddress).collect(Collectors.toSet());
     }
 
 }
