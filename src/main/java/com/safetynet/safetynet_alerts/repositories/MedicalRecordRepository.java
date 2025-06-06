@@ -22,7 +22,7 @@ public class MedicalRecordRepository {
     }
 
 
-    public Optional<MedicalRecord> findByFirstAndLastName(String firstName, String lastName) {
+    public Optional<MedicalRecord> findOptionalByFirstAndLastName(String firstName, String lastName) {
         return jsonDataLoader.getMedicalRecords().stream()
                 .filter(m -> m.getFirstName().equalsIgnoreCase(firstName)
                         && m.getLastName().equalsIgnoreCase(lastName))

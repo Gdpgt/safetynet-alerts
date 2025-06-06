@@ -31,7 +31,7 @@ public class PersonService {
 
 
     public ResponseEntity<String> registerIfAbsent(PersonDTO dto) {
-        Optional<Person> existingPerson = personRepository.findByFirstAndLastName(dto.getFirstName(), dto.getLastName());
+        Optional<Person> existingPerson = personRepository.findOptionalByFirstAndLastName(dto.getFirstName(), dto.getLastName());
 
         if (existingPerson.isEmpty()) {
             personRepository.add(dto.toPerson());
@@ -44,7 +44,7 @@ public class PersonService {
 
 
     public ResponseEntity<String> updatePersonalInformation(PersonDTO dto) {
-        Optional<Person> existingPerson = personRepository.findByFirstAndLastName(dto.getFirstName(), dto.getLastName());
+        Optional<Person> existingPerson = personRepository.findOptionalByFirstAndLastName(dto.getFirstName(), dto.getLastName());
 
         if (existingPerson.isPresent()) {
             personRepository.updatePersonalInformation(existingPerson.get(), dto.toPerson());
@@ -57,7 +57,7 @@ public class PersonService {
 
 
     public ResponseEntity<String> delete(String firstName, String lastName) {
-        Optional<Person> existingPerson = personRepository.findByFirstAndLastName(firstName, lastName);
+        Optional<Person> existingPerson = personRepository.findOptionalByFirstAndLastName(firstName, lastName);
 
         if (existingPerson.isPresent()) {
             personRepository.delete(existingPerson.get());

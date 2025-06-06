@@ -34,7 +34,7 @@ public class FirestationService {
 
 
     public ResponseEntity<String> registerIfAbsent(FirestationDTO dto) {
-        Optional<Firestation> existingFirestation = firestationRepository.findByStationNumberAndAddress(dto.getStation(), dto.getAddress());
+        Optional<Firestation> existingFirestation = firestationRepository.findOptionalByStationNumberAndAddress(dto.getStation(), dto.getAddress());
 
         if (existingFirestation.isEmpty()) {
             firestationRepository.add(dto.toFirestation());
@@ -47,7 +47,7 @@ public class FirestationService {
 
 
     public ResponseEntity<String> updateStationNumber(UpdateFirestationDTO dto) {
-        Optional<Firestation> existingFirestation = firestationRepository.findByStationNumberAndAddress(dto.getOldStation(), dto.getAddress());
+        Optional<Firestation> existingFirestation = firestationRepository.findOptionalByStationNumberAndAddress(dto.getOldStation(), dto.getAddress());
 
         if (existingFirestation.isPresent()) {
             firestationRepository.updateStationNumber(existingFirestation.get(), dto.getNewStation());
@@ -60,7 +60,7 @@ public class FirestationService {
 
 
     public ResponseEntity<String> delete(FirestationDTO dto) {
-        Optional<Firestation> existingFirestation = firestationRepository.findByStationNumberAndAddress(dto.getStation(), dto.getAddress());
+        Optional<Firestation> existingFirestation = firestationRepository.findOptionalByStationNumberAndAddress(dto.getStation(), dto.getAddress());
 
         if (existingFirestation.isPresent()) {
             firestationRepository.delete(existingFirestation.get());
@@ -73,7 +73,7 @@ public class FirestationService {
 
 
     public Set<String> getAddressesByStationNumber(int stationNumber) {
-        List<Firestation> firestations = firestationRepository.findByStationNumber(stationNumber);
+        List<Firestation> firestations = firestationRepository.findAllByStationNumber(stationNumber);
         return firestations.stream().map(Firestation::getAddress).collect(Collectors.toSet());
     }
 

@@ -55,4 +55,10 @@ public class AlertController {
         return alertService.retrievePersonsInfoByLastName(lastName);
     }
 
+
+    @GetMapping("/communityEmail")
+    public ResponseEntity<Set<String>> getEmailsByCity(@RequestParam String city) {
+        return alertService.retrieveEmailsByCity(city);
+    }
+
 }

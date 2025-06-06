@@ -44,7 +44,7 @@ public class ResidentAssembler {
 
 
     public AddressAndItsResidentsDTO buildAddressResidentsDTO(String address) {
-        List<Person> residents = personRepository.findByAddress(address);
+        List<Person> residents = personRepository.findAllByAddress(address);
 
         if (residents.isEmpty()) {
             log.warn("Personne n'habite à l'adresse \"{}\".", address);

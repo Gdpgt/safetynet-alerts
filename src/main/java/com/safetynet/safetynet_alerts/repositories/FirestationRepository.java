@@ -23,7 +23,7 @@ public class FirestationRepository {
     }
 
 
-    public Optional<Firestation> findByStationNumberAndAddress(int stationNumber, String address) {
+    public Optional<Firestation> findOptionalByStationNumberAndAddress(int stationNumber, String address) {
         return jsonDataLoader.getFirestations().stream()
                 .filter(f -> f.getStation() == stationNumber
                         && f.getAddress().equalsIgnoreCase(address))
@@ -46,7 +46,7 @@ public class FirestationRepository {
     }
 
 
-    public List<Firestation> findByStationNumber(int stationNumber) {
+    public List<Firestation> findAllByStationNumber(int stationNumber) {
         return jsonDataLoader.getFirestations().stream()
                 .filter(f -> f.getStation() == stationNumber)
                 .toList();

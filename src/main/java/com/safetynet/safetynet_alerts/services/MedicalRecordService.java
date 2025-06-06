@@ -36,7 +36,7 @@ public class MedicalRecordService {
 
 
     public ResponseEntity<String> registerIfAbsent(MedicalRecordDTO dto) {
-        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findByFirstAndLastName(dto.getFirstName(), dto.getLastName());
+        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findOptionalByFirstAndLastName(dto.getFirstName(), dto.getLastName());
 
         if (existingMedicalRecord.isEmpty()) {
             medicalRecordRepository.add(dto.toMedicalRecord());
@@ -49,7 +49,7 @@ public class MedicalRecordService {
 
 
     public ResponseEntity<String> update(MedicalRecordDTO dto) {
-        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findByFirstAndLastName(dto.getFirstName(), dto.getLastName());
+        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findOptionalByFirstAndLastName(dto.getFirstName(), dto.getLastName());
 
         if (existingMedicalRecord.isPresent()) {
             medicalRecordRepository.update(existingMedicalRecord.get(), dto.toMedicalRecord());
@@ -62,7 +62,7 @@ public class MedicalRecordService {
 
 
     public ResponseEntity<String> delete(String firstName, String lastName) {
-        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findByFirstAndLastName(firstName, lastName);
+        Optional<MedicalRecord> existingMedicalRecord = medicalRecordRepository.findOptionalByFirstAndLastName(firstName, lastName);
 
         if (existingMedicalRecord.isPresent()) {
             medicalRecordRepository.delete(existingMedicalRecord.get());

@@ -24,7 +24,7 @@ public class PersonRepository {
     }
 
 
-    public Optional<Person> findByFirstAndLastName(String firstName, String lastName) {
+    public Optional<Person> findOptionalByFirstAndLastName(String firstName, String lastName) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> p.getFirstName().equalsIgnoreCase(firstName)
                         && p.getLastName().equalsIgnoreCase(lastName))
@@ -51,23 +51,30 @@ public class PersonRepository {
     }
 
 
-    public Set<Person> findByAddresses(Set<String> addresses) {
+    public Set<Person> findAllByAddresses(Set<String> addresses) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> addresses.contains(p.getAddress()))
                 .collect(Collectors.toSet());
     }
 
 
-    public List<Person> findByAddress(String address) {
+    public List<Person> findAllByAddress(String address) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> p.getAddress().equalsIgnoreCase(address))
                 .toList();
     }
 
 
-    public List<Person> findByLastName(String lastName) {
+    public List<Person> findAllByLastName(String lastName) {
         return jsonDataLoader.getPersons().stream()
                 .filter(p -> p.getLastName().equalsIgnoreCase(lastName))
+                .toList();
+    }
+
+
+    public List<Person> findAllByCity(String city) {
+        return jsonDataLoader.getPersons().stream()
+                .filter(p -> p.getCity().equalsIgnoreCase(city))
                 .toList();
     }
 
