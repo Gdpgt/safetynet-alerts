@@ -1,6 +1,7 @@
 package com.safetynet.safetynet_alerts.utils;
 
 import com.safetynet.safetynet_alerts.dto.PersonDTO;
+import com.safetynet.safetynet_alerts.models.Firestation;
 import com.safetynet.safetynet_alerts.models.Person;
 
 public class TestUtils {
@@ -13,6 +14,11 @@ public class TestUtils {
 
     public static PersonDTO createFakePersonDTO() {
         return PersonDTO.builder().firstName("Alice").build();
+    }
+
+
+    public static Firestation createFakeFirestation(String address, int stationNumber) {
+        return new Firestation(address, stationNumber);
     }
 
 }
