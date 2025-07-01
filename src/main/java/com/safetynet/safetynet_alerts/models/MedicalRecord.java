@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = {"firstName", "lastName"})
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class MedicalRecord {
 
     private String firstName;

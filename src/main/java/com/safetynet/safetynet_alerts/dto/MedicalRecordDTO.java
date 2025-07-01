@@ -2,13 +2,15 @@ package com.safetynet.safetynet_alerts.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
+
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@Builder
 public class MedicalRecordDTO {
 
     private String firstName;
