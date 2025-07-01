@@ -1,11 +1,12 @@
 package com.safetynet.safetynet_alerts.dto;
 
-import com.safetynet.safetynet_alerts.models.MedicalRecord;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class ResidentByAddressDTO {
 
     private String lastName;
