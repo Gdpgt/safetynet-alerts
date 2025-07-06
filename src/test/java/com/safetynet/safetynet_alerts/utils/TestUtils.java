@@ -40,6 +40,21 @@ public class TestUtils {
                 .build();
     }
 
+
+    public static Person createFakePerson(String first, String last,
+                                          String address, String city,
+                                          String phone, String email) {
+        return Person.builder()
+                .firstName(first)
+                .lastName(last)
+                .address(address)
+                .city(city)
+                .phone(phone)
+                .email(email)
+                .build();
+    }
+
+
     public static PersonDTO createFakePersonDTO() {
         return PersonDTO.builder()
                 .firstName("Alice")

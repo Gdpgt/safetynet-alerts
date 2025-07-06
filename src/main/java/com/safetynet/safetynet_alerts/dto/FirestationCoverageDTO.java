@@ -11,5 +11,5 @@ public class FirestationCoverageDTO {
 
     private List<PersonCoveredByFirestationDTO> coveredPersons;
     private long numberOfAdults;
-    private long numberofChildren;
+    private long numberOfChildren;
 }
