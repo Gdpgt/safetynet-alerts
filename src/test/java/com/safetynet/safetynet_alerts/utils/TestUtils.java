@@ -2,6 +2,7 @@ package com.safetynet.safetynet_alerts.utils;
 
 import java.util.List;
 import java.util.Set;
+import java.time.LocalDate;
 
 import com.safetynet.safetynet_alerts.dto.AddressAndItsResidentsDTO;
 import com.safetynet.safetynet_alerts.dto.ChildDTO;
@@ -26,48 +27,84 @@ public class TestUtils {
 
     // Pour les persons
     public static Person createFakePerson(String firstName) {
-        return Person.builder().firstName(firstName).build();
+        return Person.builder()
+                .firstName(firstName)
+                .build();
     }
 
 
+    public static Person createFakePerson(String firstName, String lastName) {
+        return Person.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .build();
+    }
+
     public static PersonDTO createFakePersonDTO() {
-        return PersonDTO.builder().firstName("Alice").build();
+        return PersonDTO.builder()
+                .firstName("Alice")
+                .build();
     }
 
 
     // Pour les firestations
     public static Firestation createFakeFirestation(String address, int stationNumber) {
-        return Firestation.builder().address(address).station(stationNumber).build();
+        return Firestation.builder()
+                .address(address)
+                .station(stationNumber)
+                .build();
     }
 
 
     public static FirestationDTO createFakeFirestationDTO() {
-        return FirestationDTO.builder().address("10 Downing Street").station(1).build();
+        return FirestationDTO.builder()
+                .address("10 Downing Street")
+                .station(1)
+                .build();
     }
 
 
     public static UpdateFirestationDTO createFakeUpdateFirestationDTO() {
-        return UpdateFirestationDTO.builder().address("10 Downing Street").oldStation(1).newStation(2).build();
+        return UpdateFirestationDTO.builder()
+                .address("10 Downing Street")
+                .oldStation(1)
+                .newStation(2)
+                .build();
     }
 
 
     // Pour les medicalRecords
     public static MedicalRecord createFakeMedicalRecord(String firstName) {
-        return MedicalRecord.builder().firstName(firstName).build();
+        return MedicalRecord.builder()
+                .firstName(firstName)
+                .build();
+    }
+
+
+    public static MedicalRecord createFakeMedicalRecord(String first, String last, LocalDate birthdate) {
+        return MedicalRecord.builder()
+                .firstName(first)
+                .lastName(last)
+                .birthdate(birthdate)
+                .medications(List.of())
+                .allergies(List.of())
+                .build();
     }
 
 
     public static MedicalRecordDTO createFakeMedicalRecordDTO() {
-        return MedicalRecordDTO.builder().firstName("Alice").build();
+        return MedicalRecordDTO.builder()
+                .firstName("Alice")
+                .build();
     }
 
 
     // Pour les alertes
     public static FirestationCoverageDTO createFakeFirestationCoverageDTO() {
         return new FirestationCoverageDTO(
-                List.of(PersonCoveredByFirestationDTO.builder().firstName("John").build()),
-                1,
-                0
+                List.of(PersonCoveredByFirestationDTO.builder()
+                        .firstName("John")
+                        .build()), 1, 0
         );
     }
 
@@ -84,8 +121,9 @@ public class TestUtils {
 
     public static ResidentsAndStationByAddressDTO createFakeResidentsAndStationByAddressDTO() {
         return new ResidentsAndStationByAddressDTO(
-                List.of(ResidentByAddressDTO.builder().lastName("Doe").build()),
-                1
+                List.of(ResidentByAddressDTO.builder()
+                        .lastName("Doe")
+                        .build()), 1
         );
     }
 
@@ -96,7 +134,9 @@ public class TestUtils {
     }
 
     public static ResidentByLastNameDTO createFakeResidentByLastNameDTO() {
-        return ResidentByLastNameDTO.builder().lastName("Doe").build();
+        return ResidentByLastNameDTO.builder()
+                .lastName("Doe")
+                .build();
     }
 
 }
