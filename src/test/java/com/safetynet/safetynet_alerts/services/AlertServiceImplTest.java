@@ -60,7 +60,7 @@ class AlertServiceImplTest {
         when(firestationService.getAddressesByStationNumber(station)).thenReturn(addresses);
 
         Person john = TestUtils.createFakePerson("John", "Doe",
-                "10 Downing Street", "Culver",
+                "10 Downing Street", "London",
                 "0600000000", "john@doe.com");
         Set<Person> coveredPersons = Set.of(john);
         when(personRepository.findAllByAddresses(addresses)).thenReturn(coveredPersons);
@@ -102,8 +102,8 @@ class AlertServiceImplTest {
     void retrieveChildrenAndFamilyMembersByAddress_shouldReturnDTO_whenChildrenPresent() {
         // Arrange
         String address = "10 Downing Street";
-        Person child = TestUtils.createFakePerson("Enfant", "Doe", address, "Culver", "111", "Enfant@mail.com");
-        Person adult = TestUtils.createFakePerson("Parent", "Doe", address, "Culver", "222", "parent@mail.com");
+        Person child = TestUtils.createFakePerson("Enfant", "Doe", address, "London", "111", "Enfant@mail.com");
+        Person adult = TestUtils.createFakePerson("Parent", "Doe", address, "London", "222", "parent@mail.com");
         when(personRepository.findAllByAddress(address)).thenReturn(List.of(child, adult));
 
         MedicalRecord mrChild  = TestUtils.createFakeMedicalRecord("Enfant", "Doe",  LocalDate.of(2015, 1, 1));
@@ -132,7 +132,7 @@ class AlertServiceImplTest {
     void retrieveChildrenAndFamilyMembersByAddress_shouldReturnNullBody_whenNoChildren() {
         // Arrange
         String address = "36 quai des Orfèvres";
-        Person adult = TestUtils.createFakePerson("Alice", "Ebob", address, "Culver", "333", "alice@mail.com");
+        Person adult = TestUtils.createFakePerson("Alice", "Ebob", address, "Paris", "333", "alice@mail.com");
         when(personRepository.findAllByAddress(address)).thenReturn(List.of(adult));
 
         MedicalRecord mrAdult = TestUtils.createFakeMedicalRecord("Alice", "Ebob", LocalDate.of(1980, 1, 1));
@@ -170,7 +170,7 @@ class AlertServiceImplTest {
         Set<String> addresses = Set.of("10 Downing Street");
         when(firestationService.getAddressesByStationNumber(station)).thenReturn(addresses);
 
-        Person john = TestUtils.createFakePerson("John", "Doe", "10 Downing Street", "Culver", "0600000000", "john@doe.com");
+        Person john = TestUtils.createFakePerson("John", "Doe", "10 Downing Street", "London", "0600000000", "john@doe.com");
         when(personRepository.findAllByAddresses(addresses)).thenReturn(Set.of(john));
 
         // Act
@@ -214,7 +214,7 @@ class AlertServiceImplTest {
         when(firestationService.getStationNumberByAddress(address)).thenReturn(Optional.of(1));
 
         List<Person> persons = List.of(TestUtils.createFakePerson("John", "Doe", address,
-                "Culver", "111", "john@doe.com"));
+                "London", "111", "john@doe.com"));
         when(personRepository.findAllByAddress(address)).thenReturn(persons);
 
         List<ResidentByAddressDTO> residents = List.of(ResidentByAddressDTO.builder().lastName("Doe").build());
@@ -285,7 +285,7 @@ class AlertServiceImplTest {
         // Arrange
         String lastName = "Ebob";
         List<Person> persons = List.of(TestUtils.createFakePerson("Alice", lastName,
-                "123", "Culver", "555", "alice@ebob.com"));
+                "123", "Paris", "555", "alice@ebob.com"));
         when(personRepository.findAllByLastName(lastName)).thenReturn(persons);
 
         List<ResidentByLastNameDTO> dto = List.of(ResidentByLastNameDTO.builder().lastName("Ebob").build());
@@ -315,7 +315,7 @@ class AlertServiceImplTest {
     @Test
     void retrieveEmailsByCity_shouldReturnEmails_whenPersonsFound() {
         // Arrange
-        String city = "Culver";
+        String city = "Paris";
         Person alice = TestUtils.createFakePerson("Alice", "Ebob", "123", city, "0600000000", "alice@ebob.com");
         when(personRepository.findAllByCity(city)).thenReturn(List.of(alice));
 

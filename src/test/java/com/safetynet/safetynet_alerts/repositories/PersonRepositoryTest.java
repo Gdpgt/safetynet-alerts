@@ -114,8 +114,8 @@ public class PersonRepositoryTest {
     @Test
     void findAllByAddresses_shouldReturnMatchingPersons() {
         // Arrange
-        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "City", "0600000000", "alice@ebob.com");
-        Person p2 = TestUtils.createFakePerson("John", "Doe",  "36 quai des Orfèvres", "City", "0700000000", "john@doe.com");
+        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "London", "0600000000", "alice@ebob.com");
+        Person p2 = TestUtils.createFakePerson("John", "Doe",  "36 quai des Orfèvres", "Paris", "0700000000", "john@doe.com");
         when(jsonDataLoader.getPersons()).thenReturn(List.of(p1, p2));
         Set<String> addresses = Set.of("10 Downing Street");
 
@@ -130,7 +130,7 @@ public class PersonRepositoryTest {
     @Test
     void findAllByAddress_shouldReturnList_whenAddressMatches() {
         // Arrange
-        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "City", "060000000", "alice@ebob.com");
+        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "London", "060000000", "alice@ebob.com");
         when(jsonDataLoader.getPersons()).thenReturn(List.of(p1));
 
         // Act
@@ -144,8 +144,8 @@ public class PersonRepositoryTest {
     @Test
     void findAllByLastName_shouldReturnList_whenLastNameMatches() {
         // Arrange
-        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "City", "060000000", "alice@ebob.com");
-        Person p2 = TestUtils.createFakePerson("John", "Ebob",  "36 quai des Orfèvres", "City", "0700000000", "john@ebob.com");
+        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "London", "060000000", "alice@ebob.com");
+        Person p2 = TestUtils.createFakePerson("John", "Ebob",  "36 quai des Orfèvres", "Paris", "0700000000", "john@ebob.com");
         when(jsonDataLoader.getPersons()).thenReturn(List.of(p1, p2));
 
         // Act
@@ -159,11 +159,11 @@ public class PersonRepositoryTest {
     @Test
     void findAllByCity_shouldReturnList_whenCityMatches() {
         // Arrange
-        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "Paris", "060000000", "alice@ebob.com");
+        Person p1 = TestUtils.createFakePerson("Alice", "Ebob", "10 Downing Street", "London", "060000000", "alice@ebob.com");
         when(jsonDataLoader.getPersons()).thenReturn(List.of(p1));
 
         // Act
-        List<Person> result = personRepository.findAllByCity("Paris");
+        List<Person> result = personRepository.findAllByCity("London");
 
         // Assert
         assertEquals(List.of(p1), result);

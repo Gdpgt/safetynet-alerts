@@ -112,7 +112,7 @@ public class PersonServiceImplTest {
     void delete_shouldRemovePerson_whenPersonExists() {
         // Arrange
         String firstName = "John";
-        String lastName = "Boyd";
+        String lastName = "Doe";
         Person person = TestUtils.createFakePerson(firstName);
         when(personRepository.findOptionalByFirstAndLastName(firstName, lastName))
                 .thenReturn(Optional.of(person));

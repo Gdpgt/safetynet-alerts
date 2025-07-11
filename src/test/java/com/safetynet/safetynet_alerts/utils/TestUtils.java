@@ -1,5 +1,6 @@
 package com.safetynet.safetynet_alerts.utils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.time.LocalDate;
@@ -101,8 +102,17 @@ public class TestUtils {
                 .firstName(first)
                 .lastName(last)
                 .birthdate(birthdate)
-                .medications(List.of())
-                .allergies(List.of())
+                .build();
+    }
+
+
+    public static MedicalRecord createFakeMedicalRecord(String first, String last, LocalDate birthdate, List<String> medications, List<String> allergies) {
+        return MedicalRecord.builder()
+                .firstName(first)
+                .lastName(last)
+                .birthdate(birthdate)
+                .medications(medications)
+                .allergies(allergies)
                 .build();
     }
 
@@ -152,6 +162,11 @@ public class TestUtils {
         return ResidentByLastNameDTO.builder()
                 .lastName("Doe")
                 .build();
+    }
+
+
+    public static LocalDate parseDate(String date) {
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
 }
