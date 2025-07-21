@@ -1,8 +1,7 @@
 package com.safetynet.safetynet_alerts.data;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.safetynet.safetynet_alerts.models.Firestation;
 import com.safetynet.safetynet_alerts.models.MedicalRecord;
@@ -13,45 +12,49 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @Data
 public class JsonDataLoader {
 
-    private List<Person> persons;
-    private List<Firestation> firestations;
-    private List<MedicalRecord> medicalRecords;
-
     private static final Logger log = LoggerFactory.getLogger(JsonDataLoader.class);
+    private static final Path DATA_PATH = Paths.get("src/main/resources/data.json");
+
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    private List<Person> persons = new ArrayList<>();
+    private List<Firestation> firestations = new ArrayList<>();
+    private List<MedicalRecord> medicalRecords = new ArrayList<>();
+
 
     @PostConstruct
     public void loadJson() {
-
         try {
-            File input = new File("src/main/resources/data.json");
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            DataSet dt = mapper.readValue(input, DataSet.class);
-
-            this.persons = dt.getPersons();
-            this.firestations = dt.getFirestations();
-            this.medicalRecords = dt.getMedicalRecords();
-
-        } catch (FileNotFoundException e) {
-            log.error("Le fichier est introuvable.", e);
-            throw new IllegalStateException("L'application ne peut pas démarrer sans data.json.", e);
-        } catch (JsonMappingException | JsonParseException e) {
-            log.error("Le format du json est incorrect.", e);
-            throw new IllegalStateException("L'application ne peut pas démarrer si data.json n'est pas au bon format.", e);
+            DataSet dt = mapper.readValue(DATA_PATH.toFile(), DataSet.class);
+            persons = new ArrayList<>(dt.getPersons());
+            firestations = new ArrayList<>(dt.getFirestations());
+            medicalRecords = new ArrayList<>(dt.getMedicalRecords());
         } catch (IOException e) {
-            log.error("Échec du chargement de data.json", e);
-            throw new IllegalStateException("L'application ne peut pas démarrer sans chargement correct du data.json.", e);
+            log.error("Impossible de charger {}", DATA_PATH.toAbsolutePath(), e);
+            throw new IllegalStateException("L'application ne peut pas démarrer sans data.json.", e);
         }
+    }
 
+
+    public synchronized void saveData() {
+        try {
+            DataSet dt = new DataSet(persons, firestations, medicalRecords);
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(DATA_PATH.toFile(), dt);
+            log.debug("data.json mis à jour.");
+        } catch (IOException e) {
+            log.error("Échec de la persistance de data.json", e);
+            throw new IllegalStateException("Écriture impossible dans data.json.", e);
+        }
     }
 }

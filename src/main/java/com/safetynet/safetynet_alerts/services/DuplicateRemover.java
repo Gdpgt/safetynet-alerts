@@ -27,6 +27,8 @@ public class DuplicateRemover {
         jsonDataLoader.setFirestations(removeDuplicates(jsonDataLoader.getFirestations()));
         jsonDataLoader.setMedicalRecords(removeDuplicates(jsonDataLoader.getMedicalRecords()));
 
+        jsonDataLoader.saveData();
+
         log.info("Les doublons ont été supprimés des données source.");
     }
 

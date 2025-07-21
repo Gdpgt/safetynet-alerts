@@ -34,6 +34,7 @@ public class PersonRepository {
 
     public void add(Person person) {
         jsonDataLoader.getPersons().add(person);
+        jsonDataLoader.saveData();
     }
 
 
@@ -43,11 +44,13 @@ public class PersonRepository {
         existingPerson.setZip(updatedData.getZip());
         existingPerson.setPhone(updatedData.getPhone());
         existingPerson.setEmail(updatedData.getEmail());
+        jsonDataLoader.saveData();
     }
 
 
     public void delete(Person existingPerson) {
         jsonDataLoader.getPersons().remove(existingPerson);
+        jsonDataLoader.saveData();
     }
 
 

@@ -33,16 +33,19 @@ public class FirestationRepository {
 
     public void add(Firestation firestation) {
         jsonDataLoader.getFirestations().add(firestation);
+        jsonDataLoader.saveData();
     }
 
 
     public void updateStationNumber(Firestation existingFirestation, int newStationNumber) {
         existingFirestation.setStation(newStationNumber);
+        jsonDataLoader.saveData();
     }
 
 
     public void delete(Firestation existingFirestation) {
         jsonDataLoader.getFirestations().remove(existingFirestation);
+        jsonDataLoader.saveData();
     }
 
 

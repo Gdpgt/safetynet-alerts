@@ -32,6 +32,7 @@ public class MedicalRecordRepository {
 
     public void add(MedicalRecord medicalRecord) {
         jsonDataLoader.getMedicalRecords().add(medicalRecord);
+        jsonDataLoader.saveData();
     }
 
 
@@ -39,11 +40,13 @@ public class MedicalRecordRepository {
         existingMedicalRecord.setBirthdate(updatedData.getBirthdate());
         existingMedicalRecord.setMedications(updatedData.getMedications());
         existingMedicalRecord.setAllergies(updatedData.getAllergies());
+        jsonDataLoader.saveData();
     }
 
 
     public void delete(MedicalRecord existingMedicalRecord) {
         jsonDataLoader.getMedicalRecords().remove(existingMedicalRecord);
+        jsonDataLoader.saveData();
     }
 
 }
